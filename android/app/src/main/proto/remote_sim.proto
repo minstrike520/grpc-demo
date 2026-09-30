@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package remotesim;
+
+// 安卓端：訊息各自成頂層類別（remotesim.ControlInput），stub 為 remotesim.RemoteSimGrpcKt
+option java_multiple_files = true;
+
+// 遠端模擬控制服務：gRPC demo 主體
+service RemoteSim {
+  // 主通道：bidirectional streaming
+  //   上行：傾角控制（20~30Hz）
+  //   下行：碰撞事件（即時）、機器人狀態（10Hz）、模擬狀態變更
+  rpc ControlStream(stream ControlInput) returns (stream ServerEvent);
+
+  // unary：連線/伺服器資訊（展示 metadata）
+  rpc GetInfo(Empty) returns (ServerInfo);
+
+  // unary：重置模擬（展示 deadline、錯誤碼）
+  rpc ResetSim(Empty) returns (SimState);
+}
+
+message Empty {}
+
+// 手機上行：傾角（弧度）
+message ControlInput {
+  float roll = 1;   // 左右傾角
+  float pitch = 2;  // 前後傾角
+}
+
+// 伺服器下行：oneof 事件流
+message ServerEvent {
+  oneof event {
+    CollisionEvent collision = 1; // 碰撞（去抖後推送，含力度）
+    RobotState     state      = 2; // 週期性狀態同步（重連後自動收到第一筆）
+    SimStatus      status     = 3; // 模擬狀態變更
+  }
+}
+
+// 碰撞事件：magnitude 正規化 0..1
+//   輕量物理：碰撞當下相對速度正規化值
+//   未來 Mujoco：真實接觸力正規化（欄位不變）
+message CollisionEvent {
+  float magnitude = 1;
+}
+
+// 機器人狀態（世界座標）
+message RobotState {
+  float x = 1;
+  float y = 2;
+  float vx = 3;
+  float vy = 4;
+  float heading = 5;
+}
+
+// 模擬狀態
+message SimStatus {
+  bool   running    = 1;
+  int32  step_count = 2;
+  float  fps        = 3;
+  string phase      = 4; // RUNNING / HALTED
+}
+
+// GetInfo 回傳
+message ServerInfo {
+  string server_name    = 1;
+  string server_version = 2;
+  int32  physics_hz     = 3;
+  float  max_speed      = 4;
+  string scene          = 5;
+  int32  obstacle_count = 6;
+  string description    = 7;
+}
+
+// ResetSim 回傳 / 初始同步快照
+message SimState {
+  RobotState         robot        = 1;
+  repeated Obstacle  obstacles    = 2;
+  bool               running      = 3;
+  float              arena_size   = 4;
+}
+
+message Obstacle {
+  float x      = 1;
+  float y      = 2;
+  float radius = 3;
+}

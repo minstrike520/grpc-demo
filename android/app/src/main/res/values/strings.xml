@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RemoteSim Demo</string>
+    <string name="app_title">gRPC 遠端模擬 Demo</string>
+
+    <string name="status_connected">已連線</string>
+    <string name="status_connecting">連線中…</string>
+    <string name="status_reconnecting">已斷線，%1$d 秒後重連…</string>
+    <string name="status_disconnected">未連線</string>
+
+    <string name="phase_running">模擬：%1$s（%.0f fps）</string>
+    <string name="phase_halted">模擬：%1$s（失控保護，小車已停）</string>
+    <string name="position_format">位置：(%.2f, %.2f)</string>
+    <string name="velocity_format">速度：(%.2f, %.2f)</string>
+    <string name="tilt_format">傾角 roll=%.2f pitch=%.2f rad</string>
+    <string name="collision_format">碰撞！magnitude=%.2f → 振動 %dms @ %d/%d</string>
+    <string name="collision_idle">等待碰撞…</string>
+
+    <string name="reset_button">重置模擬（ResetSim／1.5s deadline 演示）</string>
+    <string name="info_button">伺服器資訊（GetInfo／metadata 演示）</string>
+    <string name="server_info_format">%1$s v%2$s｜物理 %3$dHz｜max speed %4$.1f\n%5$s</string>
+
+    <string name="help_text">操作：手持手機並向前後左右傾斜，遙控萬向輪小車；撞到障礙物時手機會依碰撞力度振動。連線走 Tailscale 內網，斷線時自動重連。</string>
+</resources>
